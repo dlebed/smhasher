@@ -20,11 +20,11 @@
 // Configuration.
 
 bool g_drawDiagram     = false;
-bool g_testAll         = true;
-bool g_testExtra       = false; // excessive torture tests: Sparse, Avalanche, DiffDist, scan all seeds
+bool g_testAll         = false;
+bool g_testExtra       = true; // excessive torture tests: Sparse, Avalanche, DiffDist, scan all seeds
 bool g_testVerifyAll   = false;
 
-bool g_testSanity      = false;
+bool g_testSanity      = true;
 bool g_testSpeed       = false;
 bool g_testHashmap     = false;
 bool g_testAvalanche   = false;
@@ -36,13 +36,13 @@ bool g_testTwoBytes    = false;
 bool g_testText        = false;
 bool g_testZeroes      = false;
 bool g_testSeed        = false;
-bool g_testPerlinNoise = false;
+bool g_testPerlinNoise = true;
 bool g_testDiff        = false;
 bool g_testDiffDist    = false;
 bool g_testMomentChi2  = false;
 bool g_testPrng        = false;
 bool g_testBIC         = false;
-bool g_testBadSeeds    = false;
+bool g_testBadSeeds    = true;
 //bool g_testLongNeighbors = false;
 
 double g_speed = 0.0;
@@ -79,6 +79,67 @@ TestOpts g_testopts[] =
 
 bool MomentChi2Test ( struct HashInfo *info, int inputSize );
 
+uint32_t xmsx_fmix32 ( uint32_t h )
+{
+  h ^= h >> 16;
+  h *= 0x85ebca6b;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35;
+  h ^= h >> 16;
+
+  return h;
+}
+
+void xmsx ( const void * key, int len, uint32_t seed, void * out )
+{
+  const unsigned char *data = (const unsigned char *)key;
+  constexpr uint64_t m = 0xcdb32970830fcaa1ULL;
+  uint64_t h = seed;
+
+  h |= h << 32;
+
+  h ^= (h * m);
+  h ^= h >> 32;
+
+  h ^= (len * m);
+  h ^= h >> 32;
+
+  while (len >= 8) {
+    uint32_t d1 = *(uint32_t *)(data + 0);
+    uint32_t d2 = *(uint32_t *)(data + 4);
+
+    h = (h ^ d1) * m;
+    h ^= h >> 32;
+
+    h = (h ^ d2) * m;
+    h ^= h >> 32;
+
+    len -= 8;
+    data += 8;
+  }
+
+  while (len >= 4) {
+    uint32_t d1 = *(uint32_t *)(data + 0);
+
+    h = (h ^ d1) * m;
+    h ^= h >> 32;
+
+    len -= 4;
+    data += 4;
+  }
+
+  if (len) {
+    uint32_t d = *(uint32_t *)data;
+
+    d &= (1UL << (len * 8)) - 1;
+
+    h = (h ^ d) * m;
+    h ^= h >> 32;
+  }
+
+  *(uint32_t*)out = xmsx_fmix32(h);
+}
+
 //-----------------------------------------------------------------------------
 // This is the list of all hashes that SMHasher can test.
 
@@ -105,6 +166,8 @@ HashInfo g_hashes[] =
 #define FIBONACCI_VERIF      0xFE3BD380
 #define FNV2_VERIF           0x1967C625
 #endif
+
+      { xmsx,            32, 0xBE207D97, "xmsx", "XMSX-32", POOR, {} },
 
 #ifdef __SIZEOF_INT128__
 // M. Dietzfelbinger, T. Hagerup, J. Katajainen, and M. Penttonen. A reliable randomized
