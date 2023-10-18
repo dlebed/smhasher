@@ -106,7 +106,7 @@ HashInfo g_hashes[] =
 #define FNV2_VERIF           0x1967C625
 #endif
 
-{ xmsx32_test,          32, 0x4A6DB635, "xmsx32", "XMSX-32", GOOD, { 0x0360db67, 0x323f6a55, 0xaf3af4e4, 0xd727c10a, 0x1549b783 } },
+{ xmsx32_test,          32, 0x6B54E1D4, "xmsx32", "XMSX-32", POOR, { 0x1505929f, 0xf0a6a74a } },
 
 #ifdef __SIZEOF_INT128__
 // M. Dietzfelbinger, T. Hagerup, J. Katajainen, and M. Penttonen. A reliable randomized

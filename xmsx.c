@@ -1,17 +1,6 @@
 #include "xmsx.h"
 #include <string.h>
 
-static uint32_t xmsx32_mix(uint32_t h)
-{
-    h ^= h >> 16;
-    h *= 0x85ebca6b;
-    h ^= h >> 13;
-    h *= 0xc2b2ae35;
-    h ^= h >> 16;
-
-    return h;
-}
-
 static uint64_t xmsx32_round(uint64_t h, uint32_t d)
 {
     const uint64_t p = 0xcdb32970830fcaa1ULL;
@@ -25,14 +14,10 @@ static uint64_t xmsx32_round(uint64_t h, uint32_t d)
 uint32_t xmsx32(const void *buf, size_t len, uint32_t seed)
 {
     const unsigned char *data = (const unsigned char *)buf;
-    const uint64_t p = 0xcdb32970830fcaa1ULL;
     const size_t batch_len = sizeof(uint32_t) * 2;
     uint64_t h = ((uint64_t)seed << 32) | seed;
 
-    h = xmsx32_round(h, 0);
-
-    h ^= (len * p);
-    h ^= h >> 32;
+    h = xmsx32_round(h, len);
 
     while (len >= batch_len) {
         uint32_t d[2];
@@ -65,5 +50,5 @@ uint32_t xmsx32(const void *buf, size_t len, uint32_t seed)
         data += 4;
     }
 
-    return xmsx32_mix(h);
+    return xmsx32_round(h, h >> 47);
 }
