@@ -36,13 +36,13 @@ bool g_testTwoBytes    = false;
 bool g_testText        = false;
 bool g_testZeroes      = false;
 bool g_testSeed        = false;
-bool g_testPerlinNoise = true;
+bool g_testPerlinNoise = false;
 bool g_testDiff        = false;
 bool g_testDiffDist    = false;
 bool g_testMomentChi2  = false;
 bool g_testPrng        = false;
 bool g_testBIC         = false;
-bool g_testBadSeeds    = true;
+bool g_testBadSeeds    = false;
 //bool g_testLongNeighbors = false;
 
 double g_speed = 0.0;
@@ -106,7 +106,8 @@ HashInfo g_hashes[] =
 #define FNV2_VERIF           0x1967C625
 #endif
 
-{ xmsx32_test,          32, 0x6B54E1D4, "xmsx32", "XMSX-32", POOR, { 0x1505929f, 0xf0a6a74a } },
+{ xmsx32_test,          32, 0x6B54E1D4, "xmsx32", "XMSX-32", GOOD, { 0x1505929f, 0xf0a6a74a } },
+{ xmsx64_test,          64, 0x2DF7A6BD, "xmsx64", "XMSX-64", POOR, { } },
 
 #ifdef __SIZEOF_INT128__
 // M. Dietzfelbinger, T. Hagerup, J. Katajainen, and M. Penttonen. A reliable randomized
